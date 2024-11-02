@@ -4,6 +4,7 @@ interface MetronomeSliderProps {
   unit?: string
   min: number
   max: number
+  icon?: string
   step?: number
   modelValue: number
 }
@@ -25,14 +26,18 @@ function onInput(event: Event) {
       <label class="block text-sm font-semibold">{{ props.label }} </label>
       <div class="block text-sm">{{ props.modelValue }} {{ props.unit }}</div>
     </div>
-    <input
-      type="range"
-      :min="props.min"
-      :max="props.max"
-      :step="props.step"
-      :value="props.modelValue"
-      class="w-full"
-      @input="onInput"
-    />
+
+    <div class="flex gap-1">
+      <Icon v-if="props.icon" :name="props.icon" class="size-6" />
+      <input
+        type="range"
+        :min="props.min"
+        :max="props.max"
+        :step="props.step"
+        :value="props.modelValue"
+        class="w-full"
+        @input="onInput"
+      />
+    </div>
   </div>
 </template>
