@@ -89,6 +89,22 @@ function toggleMetronome() {
 }
 
 // ----------------------------------------
+// reset
+// ----------------------------------------
+function reset() {
+  if (isPlaying.value) {
+    stopOriginalMetronome()
+    stopHumanizedMetronome()
+  }
+  baseTempo.value = 120
+  beatsPerMeasure.value = 4
+  humanizeAmount.value = 2
+  humanizeFrequency.value = 3
+  humanizedVolume.value = 1
+  originalVolume.value = 0
+}
+
+// ----------------------------------------
 // startOriginalMetronome
 // ----------------------------------------
 function startOriginalMetronome() {
@@ -283,6 +299,8 @@ onUnmounted(stopHumanizedMetronome)
       </div>
     </div>
 
+    <hr />
+
     <div class="flex justify-between items-center">
       <label for="timeSignature" class="block text-sm font-semibold"
         >Time Signature</label
@@ -341,10 +359,17 @@ onUnmounted(stopHumanizedMetronome)
     <hr />
 
     <button
-      class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 font-semibold"
       @click="toggleMetronome"
     >
       {{ isPlaying ? 'Stop' : 'Start' }}
+    </button>
+
+    <button
+      class="bg-white py-2 px-4 rounded hover:bg-blue-600 border border-secondary-300 font-semibold"
+      @click="reset"
+    >
+      Reset
     </button>
   </div>
 </template>
