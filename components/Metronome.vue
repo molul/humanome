@@ -13,8 +13,8 @@ let originalMetronomeInterval: number | null = null
 let humanizedMetronomeInterval: number | null = null
 
 // Humanize parameters
-const humanizeAmount = ref<number>(3) // Maximum amount (in BPM) to vary from base tempo
-const humanizeFrequency = ref<number>(5) // Frequency in seconds for tempo to change
+const humanizeAmount = ref<number>(2) // Maximum amount (in BPM) to vary from base tempo
+const humanizeFrequency = ref<number>(3) // Frequency in seconds for tempo to change
 let elapsedHumanizeTime = 0 // Time tracker for humanize frequency
 let shouldHumanizeNextBeat = false // Flag to indicate if we should humanize on next beat
 
