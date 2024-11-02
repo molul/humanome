@@ -381,7 +381,7 @@ onUnmounted(stopHumanizedMetronome)
         v-for="beat in beatsPerMeasure"
         :key="`humanized-${beat}`"
         :class="[
-          'w-full h-8 rounded',
+          'w-full h-8 rounded shadow-md border-2 border-black/20',
           [
             isPlaying && _currentHumanizedBeatAux === beat
               ? 'bg-violet-600'
@@ -406,7 +406,7 @@ onUnmounted(stopHumanizedMetronome)
         v-for="beat in beatsPerMeasure"
         :key="`original-${beat}`"
         :class="[
-          'w-full h-8 rounded',
+          'w-full h-8 rounded shadow-md border-2 border-black/20',
           [isPlaying && _currentOriginalBeatAux === beat ? 'bg-green-600' : 'bg-gray-300']
         ]"
       ></div>
