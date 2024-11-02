@@ -26,8 +26,8 @@ const sliderValue = computed({
 <template>
   <div class="flex flex-col gap-3">
     <div class="flex justify-between">
-      <label class="block text-sm font-semibold">{{ props.label }} </label>
-      <div class="block text-sm">{{ props.modelValue }} {{ props.unit }}</div>
+      <label class="block font-semibold">{{ props.label }} </label>
+      <div class="block">{{ props.modelValue }} {{ props.unit }}</div>
     </div>
 
     <div class="flex gap-4 items-center">

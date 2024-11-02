@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import MetronomeSlider from './MetronomeSlider.vue'
 import SelectThemeButton from './SelectThemeButton.vue'
+import HumanizedTempoInfo from './HumanizedTempoInfo.vue'
+import Ticks from './Ticks.vue'
+import Buttons from './Buttons.vue'
 
 // Existing state variables
 const baseTempo = ref<number>(120) // Base tempo without humanization
@@ -445,7 +448,7 @@ function updateTempoWithTransition(newTempo: number) {
 
 <template>
   <div
-    class="w-full lg:max-w-sm m-auto flex flex-col gap-6 lg:gap-7 bg-white dark:bg-secondary-800 p-6 rounded-lg shadow-lg border border-secondary-300 dark:border-secondary-500"
+    class="w-full flex flex-col gap-6 lg:gap-7 bg-white dark:bg-secondary-800 rounded-lg"
   >
     <div class="flex justify-between">
       <div class="flex items-center gap-3 justify-center">
@@ -455,7 +458,7 @@ function updateTempoWithTransition(newTempo: number) {
       <SelectThemeButton />
     </div>
 
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-2">
         <MetronomeSlider
           v-model="baseTempo"
@@ -464,22 +467,17 @@ function updateTempoWithTransition(newTempo: number) {
           :min="40"
           :max="250"
         />
-        <div class="flex justify-between text-sm">
-          <div class="font-medium">Humanized tempo</div>
-          <div>{{ tempo.toFixed(2) }} BPM</div>
-        </div>
-        <div class="flex justify-between text-xs">
-          <div class="rounded bg-blue-100 dark:bg-blue-800 px-2 py-1">
-            <span class="font-semibold">From:</span> {{ transitionStartTempo.toFixed(2) }}
-          </div>
-          <div class="rounded bg-blue-100 dark:bg-blue-800 px-2 py-1">
-            <span class="font-semibold">To:</span> {{ transitionEndTempo.toFixed(2) }}
-          </div>
-        </div>
+        <HumanizedTempoInfo
+          :tempo="tempo"
+          :transition-start-tempo="transitionStartTempo"
+          :transition-end-tempo="transitionEndTempo"
+        />
       </div>
-      <hr />
+
+      <Divider />
+
       <div class="flex justify-between items-center">
-        <label for="timeSignature" class="block text-sm font-semibold"
+        <label for="timeSignature" class="block text-xs lg:text-sm font-semibold"
           >Time Signature</label
         >
         <Select
@@ -491,7 +489,7 @@ function updateTempoWithTransition(newTempo: number) {
         />
       </div>
 
-      <hr />
+      <Divider />
 
       <MetronomeSlider
         v-model="humanizeAmount"
@@ -505,11 +503,12 @@ function updateTempoWithTransition(newTempo: number) {
         v-model="humanizeFrequency"
         label="Humanize Frequency"
         unit="s"
+        class="mb-2"
         :min="1"
         :max="10"
       />
 
-      <hr />
+      <Divider />
 
       <MetronomeSlider
         v-model="humanizedVolume"
@@ -519,24 +518,15 @@ function updateTempoWithTransition(newTempo: number) {
         :step="0.01"
         icon="mdi:volume-high"
       />
+      <Ticks
+        :beats-per-measure="beatsPerMeasure"
+        :is-playing="isPlaying"
+        :current-beat="_currentHumanizedBeatAux"
+        highlight-color="bg-blue-600"
+        :reduce-opacity="humanizedVolume === 0"
+      />
 
-      <div class="flex gap-2 justify-between">
-        <div
-          v-for="beat in beatsPerMeasure"
-          :key="`humanized-${beat}`"
-          :class="[
-            'w-full h-8 rounded shadow-md border-2 border-black/20 transition-all',
-            [
-              isPlaying && _currentHumanizedBeatAux === beat
-                ? 'bg-blue-600'
-                : 'bg-gray-300',
-              humanizedVolume === 0 && 'opacity-20'
-            ]
-          ]"
-        ></div>
-      </div>
-
-      <hr />
+      <Divider />
 
       <MetronomeSlider
         v-model="originalVolume"
@@ -546,40 +536,15 @@ function updateTempoWithTransition(newTempo: number) {
         :step="0.01"
         icon="mdi:volume-high"
       />
-      <div class="flex gap-2 justify-between">
-        <div
-          v-for="beat in beatsPerMeasure"
-          :key="`original-${beat}`"
-          :class="[
-            'w-full h-8 rounded shadow-md border-2 border-black/20 transition-all',
-            [
-              isPlaying && _currentOriginalBeatAux === beat
-                ? 'bg-green-600'
-                : 'bg-gray-300',
-              originalVolume === 0 && 'opacity-20'
-            ]
-          ]"
-        ></div>
-      </div>
+      <Ticks
+        :beats-per-measure="beatsPerMeasure"
+        :is-playing="isPlaying"
+        :current-beat="_currentOriginalBeatAux"
+        highlight-color="bg-green-600"
+        :reduce-opacity="originalVolume === 0"
+      />
     </div>
 
-    <div class="flex flex-col gap-2">
-      <Button
-        class="text-white py-2 px-4 rounded font-medium transition-colors !border-transparent"
-        :class="{
-          'bg-red-600 hover:bg-red-500 active:bg-red-700': isPlaying,
-          'bg-blue-600 hover:!bg-blue-500 active:!bg-blue-700': !isPlaying
-        }"
-        @click="toggleMetronome"
-      >
-        {{ isPlaying ? 'Stop' : 'Start' }}
-      </Button>
-      <Button
-        class="text-secondary-700 dark:text-secondary-200 bg-white py-2 px-4 rounded hover:text-blue-600 hover:border-blue-600 active:text-blue-700 border border-secondary-300 dark:border-secondary-500 font-medium transition-colors dark:bg-secondary-800 dark:hover:text-blue-300 dark:hover:border-blue-300"
-        @click="reset"
-      >
-        Reset
-      </Button>
-    </div>
+    <Buttons :is-playing="isPlaying" @toggle-metronome="toggleMetronome" @reset="reset" />
   </div>
 </template>
