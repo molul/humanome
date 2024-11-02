@@ -1,0 +1,33 @@
+/* Primary and Surface Palettes */
+:root {
+  --cl-primary-50: #eff6ff;
+  --cl-primary-100: #dbeafe;
+  --cl-primary-200: #bfdbfe;
+  --cl-primary-300: #93c5fd;
+  --cl-primary-400: #60a5fa;
+  --cl-primary-500: #3b82f6;
+  --cl-primary-600: #2563eb;
+  --cl-primary-700: #1d4ed8;
+  --cl-primary-800: #1e40af;
+  --cl-primary-900: #1e3a8a;
+  --cl-primary-950: #172554;
+  --cl-secondary-50: #fafafa;
+  --cl-secondary-100: #f5f5f5;
+  --cl-secondary-200: #e5e5e5;
+  --cl-secondary-300: #d4d4d4;
+  --cl-secondary-400: #a3a3a3;
+  --cl-secondary-500: #737373;
+  --cl-secondary-600: #525252;
+  --cl-secondary-700: #404040;
+  --cl-secondary-800: #262626;
+  --cl-secondary-900: #171717;
+  --cl-secondary-950: #0a0a0a;
+
+  --scrollbar-bg: #a3a3a3; /* Light theme scrollbar background */
+  --scrollbar-thumb-bg: #fafafa; /* Light theme scrollbar thumb */
+}
+
+.dark {
+  --scrollbar-bg: #404040; /* Dark theme scrollbar background */
+  --scrollbar-thumb-bg: #171717; /* Dark theme scrollbar thumb */
+}

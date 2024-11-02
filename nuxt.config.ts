@@ -1,8 +1,17 @@
+// import Aura from '@primevue/themes/aura'
+import path from 'path'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/eslint', '@nuxt/icon', '@nuxtjs/color-mode'],
+  modules: [
+    '@primevue/nuxt-module',
+    '@nuxtjs/tailwindcss',
+    '@nuxt/eslint',
+    '@nuxt/icon',
+    '@nuxtjs/color-mode'
+  ],
 
   icon: {
     clientBundle: {
@@ -18,13 +27,26 @@ export default defineNuxtConfig({
   colorMode: {
     classSuffix: '',
     storageKey: 'theme'
-  }
+  },
 
-  // primevue: {
-  // options: {
-  //   theme: {
-  //     preset: Aura,
-  //   },
-  // },
-  // }
+  primevue: {
+    options: {
+      unstyled: true,
+      ripple: true
+    },
+    importPT: {
+      from: path.resolve(__dirname, './assets/primevuePresets/main/')
+    }
+    // options: {
+    //   ripple: true,
+    //   theme: {
+    //     preset: Aura,
+    //     options: {
+    //       prefix: 'p',
+    //       darkModeSelector: 'system',
+    //       cssLayer: false
+    //     }
+    //   }
+    // }
+  }
 })

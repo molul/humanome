@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
+
 interface MetronomeSliderProps {
   label: string
   unit?: string
@@ -8,35 +10,35 @@ interface MetronomeSliderProps {
   step?: number
   modelValue: number
 }
-const props = defineProps<MetronomeSliderProps>()
 
+const props = defineProps<MetronomeSliderProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: number): void
 }>()
 
-function onInput(event: Event) {
-  const value = (event.target as HTMLInputElement).valueAsNumber
-  emit('update:modelValue', value)
-}
+// Computed property for two-way binding with PrimeVue Slider
+const sliderValue = computed({
+  get: () => props.modelValue,
+  set: (value: number) => emit('update:modelValue', value)
+})
 </script>
 
 <template>
-  <div class="flex flex-col gap-0.5">
+  <div class="flex flex-col gap-3">
     <div class="flex justify-between">
       <label class="block text-sm font-semibold">{{ props.label }} </label>
       <div class="block text-sm">{{ props.modelValue }} {{ props.unit }}</div>
     </div>
 
-    <div class="flex gap-1">
+    <div class="flex gap-4 items-center">
       <Icon v-if="props.icon" :name="props.icon" class="size-6" />
-      <input
-        type="range"
+
+      <Slider
+        v-model="sliderValue"
         :min="props.min"
         :max="props.max"
         :step="props.step"
-        :value="props.modelValue"
         class="w-full"
-        @input="onInput"
       />
     </div>
   </div>

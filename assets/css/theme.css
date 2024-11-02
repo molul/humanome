@@ -1,9 +1,7 @@
-/* @import url('./variables/general.css');
+@import url('./variables/general.css');
 @import url('./variables/primevue.css');
-@import url('./bmButton.css'); */
-/* @import url('./tailwind.css'); */
-/* @import url('./scrollbar.css');
-@import url('primeicons/primeicons.css'); */
+/* @import url('./bmButton.css');  */
+/* @import url('primeicons/primeicons.css'); */
 
 /* @layer base { */
 html {

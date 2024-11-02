@@ -55,6 +55,18 @@ let schedulerTimerID: number | null = null
 
 // const highTempoCounter = ref(0)
 
+const timeSignatureOptions = [
+  { label: '1/1', value: 1 },
+  { label: '2/4', value: 2 },
+  { label: '3/4', value: 3 },
+  { label: '4/4', value: 4 },
+  { label: '5/4', value: 5 },
+  { label: '6/8', value: 6 },
+  { label: '7/8', value: 7 },
+  { label: '8/8', value: 8 },
+  { label: '9/8', value: 9 }
+]
+
 // ----------------------------------------
 // loadOriginalAudioBuffer
 // ----------------------------------------
@@ -470,23 +482,17 @@ function updateTempoWithTransition(newTempo: number) {
         <label for="timeSignature" class="block text-sm font-semibold"
           >Time Signature</label
         >
-        <select
-          id="timeSignature"
+        <Select
           v-model="beatsPerMeasure"
-          class="mt-1 px-1 py-1 border border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-secondary-700"
-        >
-          <option :value="1">1/1</option>
-          <option :value="2">2/4</option>
-          <option :value="3">3/4</option>
-          <option :value="4">4/4</option>
-          <option :value="5">5/4</option>
-          <option :value="6">6/8</option>
-          <option :value="7">7/8</option>
-          <option :value="8">8/8</option>
-          <option :value="9">9/8</option>
-        </select>
+          :options="timeSignatureOptions"
+          option-label="label"
+          option-value="value"
+          placeholder="Select..."
+        />
       </div>
+
       <hr />
+
       <MetronomeSlider
         v-model="humanizeAmount"
         label="Humanize Amount"
@@ -502,7 +508,9 @@ function updateTempoWithTransition(newTempo: number) {
         :min="1"
         :max="10"
       />
+
       <hr />
+
       <MetronomeSlider
         v-model="humanizedVolume"
         label="Humanized metronome"
@@ -511,6 +519,7 @@ function updateTempoWithTransition(newTempo: number) {
         :step="0.01"
         icon="mdi:volume-high"
       />
+
       <div class="flex gap-2 justify-between">
         <div
           v-for="beat in beatsPerMeasure"
@@ -525,7 +534,9 @@ function updateTempoWithTransition(newTempo: number) {
           ]"
         ></div>
       </div>
+
       <hr />
+
       <MetronomeSlider
         v-model="originalVolume"
         label="Original metronome"
@@ -551,7 +562,7 @@ function updateTempoWithTransition(newTempo: number) {
     </div>
 
     <div class="flex flex-col gap-2">
-      <button
+      <Button
         class="text-white py-2 px-4 rounded font-semibold transition-colors"
         :class="{
           'bg-red-600 hover:bg-red-500 active:bg-red-700': isPlaying,
@@ -560,13 +571,14 @@ function updateTempoWithTransition(newTempo: number) {
         @click="toggleMetronome"
       >
         {{ isPlaying ? 'Stop' : 'Start' }}
-      </button>
-      <button
+      </Button>
+      <Button
+        type="button"
         class="bg-white py-2 px-4 rounded hover:text-blue-600 hover:border-blue-600 active:text-blue-700 border border-secondary-300 font-semibold transition-colors dark:bg-secondary-800 dark:hover:text-blue-300 dark:hover:border-blue-300"
         @click="reset"
       >
         Reset
-      </button>
+      </Button>
     </div>
   </div>
 </template>
