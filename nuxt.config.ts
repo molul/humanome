@@ -13,6 +13,12 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode'
   ],
 
+  app: {
+    head: {
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }]
+    }
+  },
+
   icon: {
     clientBundle: {
       icons: ['mdi:metronome', 'solar:moon-bold', 'solar:sun-2-bold'],
