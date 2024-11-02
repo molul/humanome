@@ -15,7 +15,7 @@ useSeoMeta({
 
 <template>
   <div
-    class="p-4 lg:p-20 bg-secondary-50 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-200 h-screen-dvh flex justify-center transition-colors text-xs lg_text-sm"
+    class="p-4 lg:p-20 bg-secondary-50 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-200 h-screen-dvh flex justify-center transition-colors text-xs lg:text-sm"
   >
     <div
       class="w-full lg:max-w-sm m-auto flex flex-col gap-4 bg-white dark:bg-secondary-800 p-6 rounded-lg shadow-lg border border-secondary-300 dark:border-secondary-500"
