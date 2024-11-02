@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import MetronomeSlider from './MetronomeSlider.vue'
+import SelectThemeButton from './SelectThemeButton.vue'
 
 // Existing state variables
 const baseTempo = ref<number>(120) // Base tempo without humanization
@@ -14,7 +15,7 @@ const currentHumanizedBeat = ref<number>(0)
 
 // Humanize parameters
 const humanizeAmount = ref<number>(3) // Maximum amount (in BPM) to vary from base tempo
-const humanizeFrequency = ref<number>(1) // Frequency in seconds for tempo to change
+const humanizeFrequency = ref<number>(2) // Frequency in seconds for tempo to change
 let elapsedHumanizeTime = 0 // Time tracker for humanize frequency
 let shouldHumanizeNextBeat = false // Flag to indicate if we should humanize on next beat
 
@@ -139,7 +140,7 @@ function reset() {
   tempo.value = 120
   beatsPerMeasure.value = 4
   humanizeAmount.value = 3
-  humanizeFrequency.value = 1
+  humanizeFrequency.value = 2
   humanizedVolume.value = 1
   originalVolume.value = 0
 }
@@ -432,137 +433,138 @@ function updateTempoWithTransition(newTempo: number) {
 
 <template>
   <div
-    class="w-full lg:max-w-sm m-auto flex flex-col gap-3 bg-white p-8 rounded-lg shadow-lg border border-secondary-300"
+    class="w-full lg:max-w-sm m-auto flex flex-col gap-6 bg-white dark:bg-secondary-800 p-6 rounded-lg shadow-lg border border-secondary-300 dark:border-secondary-500"
   >
-    <div class="flex items-center gap-3 justify-center">
-      <Icon name="mdi:metronome" class="size-8" />
-      <h1 class="text-3xl font-bold text-center uppercase">Humanome</h1>
+    <div class="flex justify-between">
+      <div class="flex items-center gap-3 justify-center">
+        <Icon name="mdi:metronome" class="size-8" />
+        <h1 class="text-3xl font-bold text-center uppercase">Humanome</h1>
+      </div>
+      <SelectThemeButton />
     </div>
 
-    <div class="flex flex-col gap-1">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <MetronomeSlider
+          v-model="baseTempo"
+          label="Tempo"
+          unit="BPM"
+          :min="40"
+          :max="250"
+        />
+        <div class="flex justify-between text-sm">
+          <div class="font-medium">Humanized tempo</div>
+          <div>{{ tempo.toFixed(2) }} BPM</div>
+        </div>
+        <div class="flex justify-between text-xs">
+          <div class="rounded bg-blue-100 dark:bg-blue-800 px-2 py-1">
+            <span class="font-semibold">From:</span> {{ transitionStartTempo.toFixed(2) }}
+          </div>
+          <div class="rounded bg-blue-100 dark:bg-blue-800 px-2 py-1">
+            <span class="font-semibold">To:</span> {{ transitionEndTempo.toFixed(2) }}
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div class="flex justify-between items-center">
+        <label for="timeSignature" class="block text-sm font-semibold"
+          >Time Signature</label
+        >
+        <select
+          id="timeSignature"
+          v-model="beatsPerMeasure"
+          class="mt-1 px-1 py-1 border border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-secondary-700"
+        >
+          <option :value="1">1/1</option>
+          <option :value="2">2/4</option>
+          <option :value="3">3/4</option>
+          <option :value="4">4/4</option>
+          <option :value="5">5/4</option>
+          <option :value="6">6/8</option>
+          <option :value="7">7/8</option>
+          <option :value="8">8/8</option>
+          <option :value="9">9/8</option>
+        </select>
+      </div>
+      <hr />
       <MetronomeSlider
-        v-model="baseTempo"
-        label="Tempo"
-        unit="BPM"
-        :min="40"
-        :max="250"
+        v-model="humanizeAmount"
+        label="Humanize Amount"
+        unit="%"
+        :min="0"
+        :max="10"
+        :step="0.1"
       />
-
-      <div class="flex justify-between text-sm">
-        <div class="font-medium">Humanized tempo</div>
-        <div>{{ tempo.toFixed(2) }} BPM</div>
+      <MetronomeSlider
+        v-model="humanizeFrequency"
+        label="Humanize Frequency"
+        unit="s"
+        :min="1"
+        :max="10"
+      />
+      <hr />
+      <MetronomeSlider
+        v-model="humanizedVolume"
+        label="Humanized metronome"
+        :min="0"
+        :max="1"
+        :step="0.01"
+        icon="mdi:volume-high"
+      />
+      <div class="flex gap-2 justify-between">
+        <div
+          v-for="beat in beatsPerMeasure"
+          :key="`humanized-${beat}`"
+          :class="[
+            'w-full h-8 rounded shadow-md border-2 border-black/20',
+            [
+              isPlaying && _currentHumanizedBeatAux === beat
+                ? 'bg-blue-600'
+                : 'bg-gray-300'
+            ]
+          ]"
+        ></div>
       </div>
-      <div class="flex justify-between text-xs">
-        <div class="rounded bg-blue-100 p-1">
-          <span class="font-medium">From:</span> {{ transitionStartTempo.toFixed(2) }}
-        </div>
-        <div class="rounded bg-blue-100 p-1">
-          <span class="font-medium">To:</span> {{ transitionEndTempo.toFixed(2) }}
-        </div>
+      <hr />
+      <MetronomeSlider
+        v-model="originalVolume"
+        label="Original metronome"
+        :min="0"
+        :max="1"
+        :step="0.01"
+        icon="mdi:volume-high"
+      />
+      <div class="flex gap-2 justify-between">
+        <div
+          v-for="beat in beatsPerMeasure"
+          :key="`original-${beat}`"
+          :class="[
+            'w-full h-8 rounded shadow-md border-2 border-black/20',
+            [
+              isPlaying && _currentOriginalBeatAux === beat
+                ? 'bg-green-600'
+                : 'bg-gray-300'
+            ]
+          ]"
+        ></div>
       </div>
-    </div>
-
-    <hr />
-
-    <div class="flex justify-between items-center">
-      <label for="timeSignature" class="block text-sm font-semibold"
-        >Time Signature</label
+      <hr />
+      <button
+        class="text-white py-2 px-4 rounded font-semibold transition-colors"
+        :class="{
+          'bg-red-600 hover:bg-red-500 active:bg-red-700': isPlaying,
+          'bg-blue-600 hover:bg-blue-500 active:bg-blue-700': !isPlaying
+        }"
+        @click="toggleMetronome"
       >
-      <select
-        id="timeSignature"
-        v-model="beatsPerMeasure"
-        class="mt-1 px-1 py-1 border border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+        {{ isPlaying ? 'Stop' : 'Start' }}
+      </button>
+      <button
+        class="bg-white py-2 px-4 rounded hover:text-blue-600 hover:border-blue-600 active:text-blue-700 border border-secondary-300 font-semibold transition-colors dark:bg-secondary-800 dark:hover:text-blue-300 dark:hover:border-blue-300"
+        @click="reset"
       >
-        <option :value="1">1/1</option>
-        <option :value="2">2/4</option>
-        <option :value="3">3/4</option>
-        <option :value="4">4/4</option>
-        <option :value="5">5/4</option>
-        <option :value="6">6/8</option>
-        <option :value="7">7/8</option>
-        <option :value="8">8/8</option>
-        <option :value="9">9/8</option>
-      </select>
+        Reset
+      </button>
     </div>
-
-    <hr />
-
-    <MetronomeSlider
-      v-model="humanizeAmount"
-      label="Humanize Amount"
-      unit="%"
-      :min="0"
-      :max="10"
-      :step="0.1"
-    />
-    <MetronomeSlider
-      v-model="humanizeFrequency"
-      label="Humanize Frequency"
-      unit="s"
-      :min="1"
-      :max="10"
-    />
-
-    <hr />
-
-    <MetronomeSlider
-      v-model="humanizedVolume"
-      label="Humanized metronome"
-      :min="0"
-      :max="1"
-      :step="0.01"
-      icon="mdi:volume-high"
-    />
-    <div class="flex gap-2 justify-between">
-      <div
-        v-for="beat in beatsPerMeasure"
-        :key="`humanized-${beat}`"
-        :class="[
-          'w-full h-8 rounded shadow-md border-2 border-black/20',
-          [isPlaying && _currentHumanizedBeatAux === beat ? 'bg-blue-600' : 'bg-gray-300']
-        ]"
-      ></div>
-    </div>
-
-    <hr />
-    <MetronomeSlider
-      v-model="originalVolume"
-      label="Original metronome"
-      :min="0"
-      :max="1"
-      :step="0.01"
-      icon="mdi:volume-high"
-    />
-
-    <div class="flex gap-2 justify-between">
-      <div
-        v-for="beat in beatsPerMeasure"
-        :key="`original-${beat}`"
-        :class="[
-          'w-full h-8 rounded shadow-md border-2 border-black/20',
-          [isPlaying && _currentOriginalBeatAux === beat ? 'bg-green-600' : 'bg-gray-300']
-        ]"
-      ></div>
-    </div>
-
-    <hr />
-
-    <button
-      class="text-white py-2 px-4 rounded font-semibold transition-colors"
-      :class="{
-        'bg-red-600 hover:bg-red-500 active:bg-red-700': isPlaying,
-        'bg-blue-600 hover:bg-blue-500 active:bg-blue-700': !isPlaying
-      }"
-      @click="toggleMetronome"
-    >
-      {{ isPlaying ? 'Stop' : 'Start' }}
-    </button>
-
-    <button
-      class="bg-white py-2 px-4 rounded hover:text-blue-600 active:text-blue-700 border border-secondary-300 font-semibold transition-colors"
-      @click="reset"
-    >
-      Reset
-    </button>
   </div>
 </template>
