@@ -1,146 +1,222 @@
 <script lang="ts" setup>
 import MetronomeSlider from './MetronomeSlider.vue'
 
-interface MetronomeProps {
-  enableHumanize: boolean
-}
-
-const props = defineProps<MetronomeProps>()
-
 const baseTempo = ref<number>(120) // Base tempo without humanization
 const tempo = ref<number>(120) // Current playing tempo
 const beatsPerMeasure = ref<number>(4)
 const isPlaying = ref<boolean>(false)
-const currentBeat = ref<number>(0)
-let metronomeInterval: number | null = null
+
+const currentOriginalBeat = ref<number>(0)
+const currentHumanizedBeat = ref<number>(0)
+
+let originalMetronomeInterval: number | null = null
+let humanizedMetronomeInterval: number | null = null
 
 // Humanize parameters
-const humanizeAmount = ref<number>(2.5) // Maximum amount (in BPM) to vary from base tempo
+const humanizeAmount = ref<number>(3) // Maximum amount (in BPM) to vary from base tempo
 const humanizeFrequency = ref<number>(5) // Frequency in seconds for tempo to change
 let elapsedHumanizeTime = 0 // Time tracker for humanize frequency
 let shouldHumanizeNextBeat = false // Flag to indicate if we should humanize on next beat
 
 // Volume parameters
-const originalVolume = ref<number>(1) // Volume for original metronome
+const originalVolume = ref<number>(0) // Volume for original metronome
 const humanizedVolume = ref<number>(1) // Volume for humanized metronome
 
+// Audio clips
+const humanizedTickSound = ref()
+const humanizedRestSound = ref()
+const originalTickSound = ref()
+const originalRestSound = ref()
+
+onMounted(() => {
+  humanizedTickSound.value = new Audio('/ticks/Synth_Square_A_hi.wav')
+  humanizedRestSound.value = new Audio('/ticks/Synth_Square_A_lo.wav')
+
+  // Set volume for humanized sounds
+  humanizedTickSound.value.volume = humanizedVolume.value
+  humanizedRestSound.value.volume = humanizedVolume.value
+
+  originalTickSound.value = new Audio('/ticks/Perc_Clap_hi.wav')
+  originalRestSound.value = new Audio('/ticks/Perc_Clap_lo.wav')
+
+  // Set volume for original sounds
+  originalTickSound.value.volume = originalVolume.value
+  originalRestSound.value.volume = originalVolume.value
+})
+
+// ----------------------------------------
+// toggleMetronome
+// ----------------------------------------
 function toggleMetronome() {
   if (isPlaying.value) {
-    stopMetronome()
+    stopOriginalMetronome()
+    stopHumanizedMetronome()
   } else {
-    startMetronome()
+    startOriginalMetronome()
+    startHumanizedMetronome()
   }
 }
 
-function startMetronome() {
-  stopMetronome()
+// ----------------------------------------
+// startOriginalMetronome
+// ----------------------------------------
+function startOriginalMetronome() {
+  stopOriginalMetronome()
   tempo.value = baseTempo.value // Set initial tempo to base tempo
   isPlaying.value = true
-  updateMetronomeInterval() // Start metronome with current tempo
+  updateOriginalMetronomeInterval() // Start metronome with current tempo
 }
 
-function stopMetronome() {
-  if (metronomeInterval) clearInterval(metronomeInterval)
+// ----------------------------------------
+// startHumanizedMetronome
+// ----------------------------------------
+function startHumanizedMetronome() {
+  stopHumanizedMetronome()
+  tempo.value = baseTempo.value // Set initial tempo to base tempo
+  isPlaying.value = true
+  updateHumanizedMetronomeInterval() // Start metronome with current tempo
+}
+
+// ----------------------------------------
+// stopOriginalMetronome
+// ----------------------------------------
+function stopOriginalMetronome() {
+  if (originalMetronomeInterval) clearInterval(originalMetronomeInterval)
   isPlaying.value = false
-  currentBeat.value = 0
+  currentOriginalBeat.value = 0
+}
+
+// ----------------------------------------
+// stopHumanizedMetronome
+// ----------------------------------------
+function stopHumanizedMetronome() {
+  if (humanizedMetronomeInterval) clearInterval(humanizedMetronomeInterval)
+  isPlaying.value = false
+  currentHumanizedBeat.value = 0
   elapsedHumanizeTime = 0 // Reset elapsed time
   shouldHumanizeNextBeat = false // Reset humanize flag
 }
 
-// const humanizedTickSound = ref()
-// const humanizedRestSound = ref()
-// const originalTickSound = ref()
-// const originalRestSound = ref()
+// ----------------------------------------
+// playOriginalBeatSound
+// ----------------------------------------
+function playOriginalBeatSound() {
+  originalTickSound.value.volume = originalVolume.value
+  originalRestSound.value.volume = originalVolume.value
 
-// Function to set initial volume for audio instances
-// function setupSounds() {
-//   humanizedTickSound.value = new Audio('/ticks/Synth_Square_A_hi.wav')
-//   humanizedRestSound.value = new Audio('/ticks/Synth_Square_A_lo.wav')
-//   originalTickSound.value = new Audio('/ticks/Perc_Clap_hi.wav')
-//   originalRestSound.value = new Audio('/ticks/Perc_Clap_lo.wav')
+  if (currentOriginalBeat.value === 0) {
+    originalTickSound.value.play()
+  } else {
+    originalRestSound.value.play()
+  }
+}
 
-//   originalTickSound.value.volume = originalVolume.value
-//   originalRestSound.value.volume = originalVolume.value
-//   humanizedTickSound.value.volume = humanizedVolume.value
-//   humanizedRestSound.value.volume = humanizedVolume.value
-// }
+// ----------------------------------------
+// playHumanizedBeatSound
+// ----------------------------------------
+function playHumanizedBeatSound() {
+  humanizedTickSound.value.volume = humanizedVolume.value
+  humanizedRestSound.value.volume = humanizedVolume.value
 
-// // Call setupSounds() when the component mounts
-// onMounted(() => {
-//   setupSounds()
-// })
+  if (currentHumanizedBeat.value === 0) {
+    humanizedTickSound.value.play()
+  } else {
+    humanizedRestSound.value.play()
+  }
+}
 
-function playBeat() {
-  // Create audio instances here to ensure they are fresh and avoid crashes
-  const humanizedTickSound = new Audio('/ticks/Synth_Square_A_hi.wav')
-  const humanizedRestSound = new Audio('/ticks/Synth_Square_A_lo.wav')
-  const originalTickSound = new Audio('/ticks/Perc_Clap_hi.wav')
-  const originalRestSound = new Audio('/ticks/Perc_Clap_lo.wav')
-
-  // Set volume for each sound
-  originalTickSound.volume = originalVolume.value
-  originalRestSound.volume = originalVolume.value
-  humanizedTickSound.volume = humanizedVolume.value
-  humanizedRestSound.volume = humanizedVolume.value
-
+// ----------------------------------------
+// playOriginalBeat
+// ----------------------------------------
+function playOriginalBeat() {
   console.info(
-    `Beat ${currentBeat.value + 1} of ${
+    `Original Beat ${currentOriginalBeat.value + 1} of ${
       beatsPerMeasure.value
     }, Tempo: ${tempo.value.toFixed(2)} BPM`
   )
 
-  // Play the appropriate sound for the beat
-  if (currentBeat.value === 0) {
-    humanizedTickSound.play()
-    originalTickSound.play()
-    // humanizedTickSound.value.play()
-    // originalTickSound.value.play()
-  } else {
-    humanizedRestSound.play()
-    originalRestSound.play()
-    // humanizedRestSound.value.play()
-    // originalRestSound.value.play()
-  }
+  playOriginalBeatSound() // Play original sounds
 
   // Advance the beat counter
-  currentBeat.value = (currentBeat.value + 1) % beatsPerMeasure.value
+  currentOriginalBeat.value = (currentOriginalBeat.value + 1) % beatsPerMeasure.value
+
+  updateOriginalMetronomeInterval() // Restart interval with the new tempo
+}
+
+// ----------------------------------------
+// updateOriginalMetronomeInterval
+// ----------------------------------------
+function updateOriginalMetronomeInterval() {
+  if (originalMetronomeInterval) clearInterval(originalMetronomeInterval)
+  originalMetronomeInterval = window.setInterval(
+    playOriginalBeat,
+    60000 / baseTempo.value
+  )
+}
+
+// ----------------------------------------
+// playHumanizedBeat
+// ----------------------------------------
+function playHumanizedBeat() {
+  console.info(
+    `Humanized Beat ${currentHumanizedBeat.value + 1} of ${
+      beatsPerMeasure.value
+    }, Tempo: ${tempo.value.toFixed(2)} BPM`
+  )
+
+  playHumanizedBeatSound() // Play humanized sounds
+
+  // Advance the beat counter
+  currentHumanizedBeat.value = (currentHumanizedBeat.value + 1) % beatsPerMeasure.value
 
   // Check if humanize should adjust the tempo at the start of each frequency interval
-  if (props.enableHumanize) {
-    elapsedHumanizeTime += 60000 / tempo.value // Add elapsed time per beat in ms
-    if (elapsedHumanizeTime >= humanizeFrequency.value * 1000) {
-      shouldHumanizeNextBeat = true // Set flag to humanize on the next beat
-    }
+  elapsedHumanizeTime += 60000 / tempo.value // Add elapsed time per beat in ms
+  if (elapsedHumanizeTime >= humanizeFrequency.value * 1000) {
+    shouldHumanizeNextBeat = true // Set flag to humanize on the next beat
+  }
 
-    // If the flag is set, humanize the tempo at the start of the next beat
-    if (shouldHumanizeNextBeat) {
-      humanizeTempo() // Adjust the tempo
-      updateMetronomeInterval() // Restart interval with the new tempo
-      elapsedHumanizeTime = 0 // Reset elapsed time counter
-      shouldHumanizeNextBeat = false // Reset flag after humanizing
-    }
+  // If the flag is set, humanize the tempo at the start of the next beat
+  if (shouldHumanizeNextBeat) {
+    humanizeTempo() // Adjust the tempo
+    updateHumanizedMetronomeInterval() // Restart interval with the new tempo
+    elapsedHumanizeTime = 0 // Reset elapsed time counter
+    shouldHumanizeNextBeat = false // Reset flag after humanizing
   }
 }
 
-function updateMetronomeInterval() {
-  if (metronomeInterval) clearInterval(metronomeInterval)
-  metronomeInterval = window.setInterval(playBeat, 60000 / tempo.value)
+// ----------------------------------------
+// updateHumanizedMetronomeInterval
+// ----------------------------------------
+function updateHumanizedMetronomeInterval() {
+  if (humanizedMetronomeInterval) clearInterval(humanizedMetronomeInterval)
+  humanizedMetronomeInterval = window.setInterval(playHumanizedBeat, 60000 / tempo.value)
 }
 
+// ----------------------------------------
+// humanizeTempo
+// ----------------------------------------
 function humanizeTempo() {
   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
   tempo.value = Math.random() * (maxTempo - minTempo) + minTempo
-  console.info(`Humanized Tempo: ${tempo.value.toFixed(2)} BPM`)
+  console.info(`New humanized Tempo: ${tempo.value.toFixed(2)} BPM`)
 }
 
+// ----------------------------------------
+// watch
+// ----------------------------------------
 watch([baseTempo, beatsPerMeasure], () => {
   if (isPlaying.value) {
-    startMetronome()
+    startOriginalMetronome()
+    startHumanizedMetronome()
   }
 })
 
-onUnmounted(stopMetronome)
+// ----------------------------------------
+// onUnmounted
+// ----------------------------------------
+onUnmounted(stopOriginalMetronome)
+onUnmounted(stopHumanizedMetronome)
 </script>
 
 <template>
