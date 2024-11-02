@@ -1,0 +1,54 @@
+/* @import url('./variables/general.css');
+@import url('./variables/primevue.css');
+@import url('./bmButton.css'); */
+/* @import url('./tailwind.css'); */
+/* @import url('./scrollbar.css');
+@import url('primeicons/primeicons.css'); */
+
+/* @layer base { */
+html {
+  @apply text-base;
+}
+
+body {
+  @apply text-sm font-normal font-primary;
+}
+
+hr {
+  @apply w-full border-secondary-300 dark:border-secondary-600;
+}
+
+a.textOnly,
+.mdc-article a {
+  @apply font-medium text-blue-600 dark:text-blue-200;
+}
+
+.mdc-article p {
+  @apply py-1.5;
+}
+
+@font-face {
+  font-family: Geist;
+  font-weight: 400;
+  src: url(/fonts/geist/Geist-Regular.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: Geist;
+  font-weight: 500;
+  src: url(/fonts/geist/Geist-Medium.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: Geist;
+  font-weight: 600;
+  src: url(/fonts/geist/Geist-SemiBold.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: Geist;
+  font-weight: 700;
+  src: url(/fonts/geist/Geist-Bold.woff2) format('woff2');
+  font-display: swap;
+}
+/* } */
