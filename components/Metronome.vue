@@ -38,6 +38,17 @@ const transitionEndTempo = ref<number>(tempo.value) // Ending tempo for transiti
 const transitionCurrentTime = ref<number>(0) // Current time in transition
 const isTransitioning = ref<boolean>(false) // Flag to indicate if a transition is occurring
 
+const _currentHumanizedBeatAux = computed(() =>
+  currentHumanizedBeat.value === 0 ? beatsPerMeasure.value : currentHumanizedBeat.value
+)
+
+const _currentOriginalBeatAux = computed(() =>
+  currentOriginalBeat.value === 0 ? beatsPerMeasure.value : currentOriginalBeat.value
+)
+
+// ----------------------------------------
+// onMounted
+// ----------------------------------------
 onMounted(() => {
   humanizedTickSound.value = new Audio('/ticks/Synth_Square_A_hi.wav')
   humanizedRestSound.value = new Audio('/ticks/Synth_Square_A_lo.wav')
@@ -280,13 +291,6 @@ watch([baseTempo, beatsPerMeasure], () => {
 // ----------------------------------------
 onUnmounted(stopOriginalMetronome)
 onUnmounted(stopHumanizedMetronome)
-
-const _currentHumanizedBeatAux = computed(() =>
-  currentHumanizedBeat.value === 0 ? beatsPerMeasure.value : currentHumanizedBeat.value
-)
-const _currentOriginalBeatAux = computed(() =>
-  currentOriginalBeat.value === 0 ? beatsPerMeasure.value : currentOriginalBeat.value
-)
 </script>
 
 <template>
@@ -313,7 +317,7 @@ const _currentOriginalBeatAux = computed(() =>
       </div>
       <div class="flex justify-between text-xs">
         <div class="rounded bg-secondary-200 p-1">
-          <span class="font-medium">From</span> {{ transitionStartTempo.toFixed(2) }}
+          <span class="font-medium">From:</span> {{ transitionStartTempo.toFixed(2) }}
         </div>
         <div class="rounded bg-secondary-200 p-1">
           <span class="font-medium">To:</span> {{ transitionEndTempo.toFixed(2) }}
@@ -411,10 +415,10 @@ const _currentOriginalBeatAux = computed(() =>
     <hr />
 
     <button
-      class="text-white py-2 px-4 rounded hover:bg-blue-600 font-semibold transition-colors"
+      class="text-white py-2 px-4 rounded font-semibold transition-colors"
       :class="{
-        'bg-red-500': isPlaying,
-        'bg-blue-500': !isPlaying
+        'bg-red-500 hover:bg-red-600 ': isPlaying,
+        'bg-blue-500 hover:bg-blue-600 ': !isPlaying
       }"
       @click="toggleMetronome"
     >
@@ -422,7 +426,7 @@ const _currentOriginalBeatAux = computed(() =>
     </button>
 
     <button
-      class="bg-white py-2 px-4 rounded hover:text-blue-600 border border-secondary-300 font-semibold"
+      class="bg-white py-2 px-4 rounded hover:text-blue-600 border border-secondary-300 font-semibold transition-colors"
       @click="reset"
     >
       Reset
