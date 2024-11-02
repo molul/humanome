@@ -34,6 +34,9 @@ export default <Partial<Config>>{
           }
         ]
       },
+      height: {
+        'screen-dvh': '100dvh'
+      },
       screens: {
         ms: '320px',
         mm: '375px',
