@@ -445,18 +445,18 @@ function updateTempoWithTransition(newTempo: number) {
 
 <template>
   <div
-    class="w-full lg:max-w-sm m-auto flex flex-col gap-6 bg-white dark:bg-secondary-800 p-6 rounded-lg shadow-lg border border-secondary-300 dark:border-secondary-500"
+    class="w-full lg:max-w-sm m-auto flex flex-col gap-6 lg:gap-7 bg-white dark:bg-secondary-800 p-6 rounded-lg shadow-lg border border-secondary-300 dark:border-secondary-500"
   >
     <div class="flex justify-between">
       <div class="flex items-center gap-3 justify-center">
-        <Icon name="mdi:metronome" class="size-8" />
-        <h1 class="text-3xl font-bold text-center uppercase">Humanome</h1>
+        <Icon name="mdi:metronome" class="size-6 lg:size-8" />
+        <h1 class="text-xl lg:text-3xl font-bold text-center uppercase">Humanome</h1>
       </div>
       <SelectThemeButton />
     </div>
 
     <div class="flex flex-col gap-4">
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-2">
         <MetronomeSlider
           v-model="baseTempo"
           label="Tempo"
@@ -525,11 +525,12 @@ function updateTempoWithTransition(newTempo: number) {
           v-for="beat in beatsPerMeasure"
           :key="`humanized-${beat}`"
           :class="[
-            'w-full h-8 rounded shadow-md border-2 border-black/20',
+            'w-full h-8 rounded shadow-md border-2 border-black/20 transition-all',
             [
               isPlaying && _currentHumanizedBeatAux === beat
                 ? 'bg-blue-600'
-                : 'bg-gray-300'
+                : 'bg-gray-300',
+              humanizedVolume === 0 && 'opacity-20'
             ]
           ]"
         ></div>
@@ -550,11 +551,12 @@ function updateTempoWithTransition(newTempo: number) {
           v-for="beat in beatsPerMeasure"
           :key="`original-${beat}`"
           :class="[
-            'w-full h-8 rounded shadow-md border-2 border-black/20',
+            'w-full h-8 rounded shadow-md border-2 border-black/20 transition-all',
             [
               isPlaying && _currentOriginalBeatAux === beat
                 ? 'bg-green-600'
-                : 'bg-gray-300'
+                : 'bg-gray-300',
+              originalVolume === 0 && 'opacity-20'
             ]
           ]"
         ></div>
@@ -563,18 +565,17 @@ function updateTempoWithTransition(newTempo: number) {
 
     <div class="flex flex-col gap-2">
       <Button
-        class="text-white py-2 px-4 rounded font-semibold transition-colors"
+        class="text-white py-2 px-4 rounded font-medium transition-colors !border-transparent"
         :class="{
           'bg-red-600 hover:bg-red-500 active:bg-red-700': isPlaying,
-          'bg-blue-600 hover:bg-blue-500 active:bg-blue-700': !isPlaying
+          'bg-blue-600 hover:!bg-blue-500 active:!bg-blue-700': !isPlaying
         }"
         @click="toggleMetronome"
       >
         {{ isPlaying ? 'Stop' : 'Start' }}
       </Button>
       <Button
-        type="button"
-        class="bg-white py-2 px-4 rounded hover:text-blue-600 hover:border-blue-600 active:text-blue-700 border border-secondary-300 font-semibold transition-colors dark:bg-secondary-800 dark:hover:text-blue-300 dark:hover:border-blue-300"
+        class="text-secondary-700 dark:text-secondary-200 bg-white py-2 px-4 rounded hover:text-blue-600 hover:border-blue-600 active:text-blue-700 border border-secondary-300 dark:border-secondary-500 font-medium transition-colors dark:bg-secondary-800 dark:hover:text-blue-300 dark:hover:border-blue-300"
         @click="reset"
       >
         Reset
