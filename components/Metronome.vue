@@ -18,6 +18,7 @@ let metronomeInterval: number | null = null
 const humanizeAmount = ref<number>(2.5) // Maximum amount (in BPM) to vary from base tempo
 const humanizeFrequency = ref<number>(5) // Frequency in seconds for tempo to change
 let elapsedHumanizeTime = 0 // Time tracker for humanize frequency
+let shouldHumanizeNextBeat = false // Flag to indicate if we should humanize on next beat
 
 // Volume parameters
 const originalVolume = ref<number>(1) // Volume for original metronome
@@ -39,6 +40,7 @@ function stopMetronome() {
   isPlaying.value = false
   currentBeat.value = 0
   elapsedHumanizeTime = 0 // Reset elapsed time
+  shouldHumanizeNextBeat = false // Reset humanize flag
 }
 
 function playBeat() {
@@ -76,9 +78,15 @@ function playBeat() {
   if (props.enableHumanize) {
     elapsedHumanizeTime += 60000 / tempo.value // Add elapsed time per beat in ms
     if (elapsedHumanizeTime >= humanizeFrequency.value * 1000) {
+      shouldHumanizeNextBeat = true // Set flag to humanize on the next beat
+    }
+
+    // If the flag is set, humanize the tempo at the start of the next beat
+    if (shouldHumanizeNextBeat) {
       humanizeTempo() // Adjust the tempo
       updateMetronomeInterval() // Restart interval with the new tempo
       elapsedHumanizeTime = 0 // Reset elapsed time counter
+      shouldHumanizeNextBeat = false // Reset flag after humanizing
     }
   }
 }
@@ -108,7 +116,20 @@ onUnmounted(stopMetronome)
       <h1 class="text-3xl font-bold text-center uppercase">Humanome</h1>
     </div>
 
-    <MetronomeSlider v-model="baseTempo" label="Tempo" unit="BPM" :min="40" :max="208" />
+    <div>
+      <MetronomeSlider
+        v-model="baseTempo"
+        label="Tempo"
+        unit="BPM"
+        :min="40"
+        :max="208"
+      />
+
+      <div class="flex justify-between text-sm">
+        <div class="font-medium">Humanized tempo</div>
+        <div>{{ tempo.toFixed(2) }} BPM</div>
+      </div>
+    </div>
 
     <hr />
 
@@ -131,19 +152,20 @@ onUnmounted(stopMetronome)
     <hr />
 
     <MetronomeSlider
-      v-model="originalVolume"
-      label="Original volume"
-      :min="0"
-      :max="1"
-      :step="0.01"
-    />
-    <MetronomeSlider
       v-model="humanizedVolume"
       label="Humanized volume"
       :min="0"
       :max="1"
       :step="0.01"
     />
+    <MetronomeSlider
+      v-model="originalVolume"
+      label="Original volume"
+      :min="0"
+      :max="1"
+      :step="0.01"
+    />
+
     <hr />
 
     <button

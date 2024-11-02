@@ -20,7 +20,7 @@ function onInput(event: Event) {
 </script>
 
 <template>
-  <div class="mb-4">
+  <div>
     <div class="flex justify-between">
       <label class="block text-sm font-semibold">{{ props.label }} </label>
       <div class="block text-sm">{{ props.modelValue }} {{ props.unit }}</div>
@@ -31,8 +31,8 @@ function onInput(event: Event) {
       :max="props.max"
       :step="props.step"
       :value="props.modelValue"
-      @input="onInput"
       class="w-full"
+      @input="onInput"
     />
   </div>
 </template>
