@@ -443,7 +443,7 @@ function updateTempoWithTransition(newTempo: number) {
       <SelectThemeButton />
     </div>
 
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-1">
         <MetronomeSlider
           v-model="baseTempo"
@@ -548,7 +548,9 @@ function updateTempoWithTransition(newTempo: number) {
           ]"
         ></div>
       </div>
-      <hr />
+    </div>
+
+    <div class="flex flex-col gap-2">
       <button
         class="text-white py-2 px-4 rounded font-semibold transition-colors"
         :class="{

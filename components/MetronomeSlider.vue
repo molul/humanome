@@ -21,7 +21,7 @@ function onInput(event: Event) {
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col gap-0.5">
     <div class="flex justify-between">
       <label class="block text-sm font-semibold">{{ props.label }} </label>
       <div class="block text-sm">{{ props.modelValue }} {{ props.unit }}</div>
