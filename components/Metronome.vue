@@ -13,8 +13,8 @@ const currentOriginalBeat = ref<number>(0)
 const currentHumanizedBeat = ref<number>(0)
 
 // Humanize parameters
-const humanizeAmount = ref<number>(2) // Maximum amount (in BPM) to vary from base tempo
-const humanizeFrequency = ref<number>(3) // Frequency in seconds for tempo to change
+const humanizeAmount = ref<number>(3) // Maximum amount (in BPM) to vary from base tempo
+const humanizeFrequency = ref<number>(1) // Frequency in seconds for tempo to change
 let elapsedHumanizeTime = 0 // Time tracker for humanize frequency
 let shouldHumanizeNextBeat = false // Flag to indicate if we should humanize on next beat
 
@@ -29,7 +29,6 @@ const originalTickSound = ref<AudioBuffer | null>(null)
 const originalRestSound = ref<AudioBuffer | null>(null)
 
 // Transition parameters
-const transitionDuration = ref<number>(5000) // Duration for transitions in milliseconds
 const transitionStartTempo = ref<number>(tempo.value) // Starting tempo for transitions
 const transitionEndTempo = ref<number>(tempo.value) // Ending tempo for transitions
 const transitionCurrentTime = ref<number>(0) // Current time in transition
@@ -53,19 +52,29 @@ let nextTickTimeOriginal = 0.0
 let nextTickTimeHumanized = 0.0
 let schedulerTimerID: number | null = null
 
+// const highTempoCounter = ref(0)
+
+// ----------------------------------------
+// loadOriginalAudioBuffer
+// ----------------------------------------
 async function loadOriginalAudioBuffer(url: string): Promise<AudioBuffer> {
   const response = await fetch(url)
   const arrayBuffer = await response.arrayBuffer()
   return await originalAudioContext!.decodeAudioData(arrayBuffer)
 }
 
+// ----------------------------------------
+// loadHumanizedAudioBuffer
+// ----------------------------------------
 async function loadHumanizedAudioBuffer(url: string): Promise<AudioBuffer> {
   const response = await fetch(url)
   const arrayBuffer = await response.arrayBuffer()
   return await humanizedAudioContext!.decodeAudioData(arrayBuffer)
 }
 
-// Initialize AudioContext and load audio buffers
+// ----------------------------------------
+// onMounted
+// ----------------------------------------
 onMounted(async () => {
   originalAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
   humanizedAudioContext = new (window.AudioContext ||
@@ -87,7 +96,9 @@ onMounted(async () => {
   }
 })
 
-// Cleanup on unmount
+// ----------------------------------------
+// onUnmounted
+// ----------------------------------------
 onUnmounted(() => {
   stopScheduler()
   if (originalAudioContext) {
@@ -118,27 +129,33 @@ function toggleMetronome() {
 // ----------------------------------------
 function reset() {
   if (isPlaying.value) {
+    // clearInterval(transitionInterval.value) // Clear interval
     stopOriginalMetronome()
     stopHumanizedMetronome()
     stopScheduler()
   }
+
   baseTempo.value = 120
+  tempo.value = 120
   beatsPerMeasure.value = 4
-  humanizeAmount.value = 2
-  humanizeFrequency.value = 3
+  humanizeAmount.value = 3
+  humanizeFrequency.value = 1
   humanizedVolume.value = 1
   originalVolume.value = 0
 }
 
-// ----------------------------------------
+// ++++++++++++++++++++++++++++++++++++++++++++
 // Scheduler Functions
-// ----------------------------------------
+// ++++++++++++++++++++++++++++++++++++++++++++
 
-// Start the scheduler
+// ----------------------------------------
+// startScheduler
+// ----------------------------------------
 function startScheduler() {
   if (originalAudioContext && originalAudioContext.state === 'suspended') {
     originalAudioContext.resume()
   }
+
   if (humanizedAudioContext && humanizedAudioContext.state === 'suspended') {
     humanizedAudioContext.resume()
   }
@@ -155,7 +172,9 @@ function startScheduler() {
   scheduler()
 }
 
-// Stop the scheduler
+// ----------------------------------------
+// stopScheduler
+// ----------------------------------------
 function stopScheduler() {
   if (schedulerTimerID !== null) {
     clearTimeout(schedulerTimerID)
@@ -163,7 +182,9 @@ function stopScheduler() {
   }
 }
 
-// Scheduler loop
+// ----------------------------------------
+// scheduler
+// ----------------------------------------
 function scheduler() {
   while (nextTickTimeOriginal < originalAudioContext!.currentTime + lookAhead) {
     scheduleOriginalBeat(nextTickTimeOriginal)
@@ -178,7 +199,9 @@ function scheduler() {
   schedulerTimerID = window.setTimeout(scheduler, 25)
 }
 
-// Schedule Original Beat
+// ----------------------------------------
+// scheduleOriginalBeat
+// ----------------------------------------
 function scheduleOriginalBeat(time: number) {
   if (!originalTickSound.value || !originalRestSound.value) return
 
@@ -200,7 +223,9 @@ function scheduleOriginalBeat(time: number) {
   currentOriginalBeat.value = (currentOriginalBeat.value + 1) % beatsPerMeasure.value
 }
 
-// Schedule Humanized Beat
+// ----------------------------------------
+// scheduleHumanizedBeat
+// ----------------------------------------
 function scheduleHumanizedBeat(time: number) {
   if (!humanizedTickSound.value || !humanizedRestSound.value) return
 
@@ -228,7 +253,9 @@ function scheduleHumanizedBeat(time: number) {
   }
 
   if (shouldHumanizeNextBeat) {
-    humanizeTempo()
+    // humanizeTempo()
+    // humanizeTempo2()
+    humanizeTempo3()
     shouldHumanizeNextBeat = false
   }
 }
@@ -272,13 +299,90 @@ function stopHumanizedMetronome() {
 // ----------------------------------------
 // humanizeTempo
 // ----------------------------------------
-function humanizeTempo() {
+// function humanizeTempo() {
+//   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
+//   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
+//   const newTempo = Math.random() * (maxTempo - minTempo) + minTempo
+//   updateTempoWithTransition(newTempo) // Transition to the new tempo
+// }
+
+// ----------------------------------------
+// humanizeTempo2
+// ----------------------------------------
+// function humanizeTempo2() {
+//   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
+//   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
+
+//   // Calculate 1.5% of the current tempo
+//   const adjustmentAmount = tempo.value * 0.015
+//   const minAdjustedTempo = tempo.value - adjustmentAmount
+//   const maxAdjustedTempo = tempo.value + adjustmentAmount
+
+//   let newTempo
+
+//   // If tempo has been high, prefer lower values
+//   if (highTempoCounter.value > 0) {
+//     // Create a random value biased towards lower values
+//     const lowerBias = Math.random() * 0.7 // Adjust this to change bias strength
+//     const biasedMin = minAdjustedTempo - lowerBias * adjustmentAmount
+//     const biasedMax = minAdjustedTempo + adjustmentAmount * (1 - lowerBias)
+
+//     // Clamp the new tempo between minTempo and maxTempo
+//     newTempo = Math.max(
+//       minTempo,
+//       Math.min(maxTempo, Math.random() * (biasedMax - biasedMin) + biasedMin)
+//     )
+
+//     // Decrease the counter to gradually reduce the bias
+//     highTempoCounter.value = Math.max(0, highTempoCounter.value - 1) // Reset or decrease
+//   } else {
+//     // Generate a standard random tempo when not biased
+//     newTempo = Math.max(
+//       minTempo,
+//       Math.min(
+//         maxTempo,
+//         Math.random() * (maxAdjustedTempo - minAdjustedTempo) + minAdjustedTempo
+//       )
+//     )
+//   }
+
+//   // Check if current tempo is higher than baseTempo to adjust the counter
+//   if (tempo.value > baseTempo.value) {
+//     highTempoCounter.value++
+//   }
+
+//   updateTempoWithTransition(newTempo) // Transition to the new tempo
+// }
+
+// ----------------------------------------
+// humanizeTempo3
+// ----------------------------------------
+function humanizeTempo3() {
   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
-  const newTempo = Math.random() * (maxTempo - minTempo) + minTempo
+
+  // Calculate 1.5% of the current tempo
+  const adjustmentAmount = tempo.value * (humanizeAmount.value / 2 / 100)
+  const minAdjustedTempo = tempo.value - adjustmentAmount
+  const maxAdjustedTempo = tempo.value + adjustmentAmount
+
+  // Clamp the new tempo between the calculated minTempo and maxTempo
+  const newTempo =
+    Math.round(
+      10 *
+        Math.max(
+          minTempo,
+          Math.min(
+            maxTempo,
+            Math.random() * (maxAdjustedTempo - minAdjustedTempo) + minAdjustedTempo
+          )
+        )
+    ) / 10
+
   updateTempoWithTransition(newTempo) // Transition to the new tempo
 }
 
+// const transitionInterval = ref()
 // ----------------------------------------
 // Function to update tempo with transition
 // ----------------------------------------
@@ -290,9 +394,24 @@ function updateTempoWithTransition(newTempo: number) {
   isTransitioning.value = true // Start transition process
 
   const step = 50 // Update every 50ms
-  const totalSteps = Math.ceil(transitionDuration.value / step)
+  const totalSteps = Math.ceil((humanizeFrequency.value * 1000) / step)
   let currentStep = 0
 
+  // transitionInterval.value = setInterval(() => {
+  //   currentStep++
+  //   transitionCurrentTime.value += step
+
+  //   if (currentStep >= totalSteps) {
+  //     tempo.value = transitionEndTempo.value // Set final tempo
+  //     clearInterval(transitionInterval.value) // Clear interval
+  //     isTransitioning.value = false // End transition
+  //   } else {
+  //     const progress = currentStep / totalSteps
+  //     tempo.value =
+  //       transitionStartTempo.value +
+  //       (transitionEndTempo.value - transitionStartTempo.value) * progress // Interpolate tempo
+  //   }
+  // }, step)
   const transitionInterval = setInterval(() => {
     currentStep++
     transitionCurrentTime.value += step
@@ -334,10 +453,10 @@ function updateTempoWithTransition(newTempo: number) {
         <div>{{ tempo.toFixed(2) }} BPM</div>
       </div>
       <div class="flex justify-between text-xs">
-        <div class="rounded bg-secondary-200 p-1">
+        <div class="rounded bg-blue-100 p-1">
           <span class="font-medium">From:</span> {{ transitionStartTempo.toFixed(2) }}
         </div>
-        <div class="rounded bg-secondary-200 p-1">
+        <div class="rounded bg-blue-100 p-1">
           <span class="font-medium">To:</span> {{ transitionEndTempo.toFixed(2) }}
         </div>
       </div>
@@ -400,11 +519,7 @@ function updateTempoWithTransition(newTempo: number) {
         :key="`humanized-${beat}`"
         :class="[
           'w-full h-8 rounded shadow-md border-2 border-black/20',
-          [
-            isPlaying && _currentHumanizedBeatAux === beat
-              ? 'bg-violet-600'
-              : 'bg-gray-300'
-          ]
+          [isPlaying && _currentHumanizedBeatAux === beat ? 'bg-blue-600' : 'bg-gray-300']
         ]"
       ></div>
     </div>
@@ -435,8 +550,8 @@ function updateTempoWithTransition(newTempo: number) {
     <button
       class="text-white py-2 px-4 rounded font-semibold transition-colors"
       :class="{
-        'bg-red-500 hover:bg-red-600 ': isPlaying,
-        'bg-blue-500 hover:bg-blue-600 ': !isPlaying
+        'bg-red-600 hover:bg-red-500 active:bg-red-700': isPlaying,
+        'bg-blue-600 hover:bg-blue-500 active:bg-blue-700': !isPlaying
       }"
       @click="toggleMetronome"
     >
@@ -444,7 +559,7 @@ function updateTempoWithTransition(newTempo: number) {
     </button>
 
     <button
-      class="bg-white py-2 px-4 rounded hover:text-blue-600 border border-secondary-300 font-semibold transition-colors"
+      class="bg-white py-2 px-4 rounded hover:text-blue-600 active:text-blue-700 border border-secondary-300 font-semibold transition-colors"
       @click="reset"
     >
       Reset
