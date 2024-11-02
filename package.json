@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@nuxt/eslint": "^0.6.1",
+    "@nuxt/icon": "^1.6.1",
     "husky": "^9.1.6",
     "nuxt": "^3.13.2",
     "tailwindcss-primeui": "^0.3.4",
