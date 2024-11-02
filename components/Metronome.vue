@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import MetronomeSlider from './MetronomeSlider.vue'
 
 const baseTempo = ref<number>(120) // Base tempo without humanization
@@ -28,6 +29,13 @@ const humanizedRestSound = ref()
 const originalTickSound = ref()
 const originalRestSound = ref()
 
+// Transition parameters
+const transitionDuration = ref<number>(5000) // Duration for transitions in milliseconds
+const transitionStartTempo = ref<number>(tempo.value) // Starting tempo for transitions
+const transitionEndTempo = ref<number>(tempo.value) // Ending tempo for transitions
+const transitionCurrentTime = ref<number>(0) // Current time in transition
+const isTransitioning = ref<boolean>(false) // Flag to indicate if a transition is occurring
+
 onMounted(() => {
   humanizedTickSound.value = new Audio('/ticks/Synth_Square_A_hi.wav')
   humanizedRestSound.value = new Audio('/ticks/Synth_Square_A_lo.wav')
@@ -43,6 +51,29 @@ onMounted(() => {
   originalTickSound.value.volume = originalVolume.value
   originalRestSound.value.volume = originalVolume.value
 })
+
+// Function to update tempo with transition
+function updateTempoWithTransition(newTempo: number) {
+  if (isTransitioning.value) return // Prevent new transition if one is ongoing
+  transitionStartTempo.value = tempo.value // Save current tempo as start
+  transitionEndTempo.value = newTempo // Set new tempo as end
+  transitionCurrentTime.value = 0 // Reset current time
+  isTransitioning.value = true // Start transition process
+
+  const transitionInterval = setInterval(() => {
+    if (transitionCurrentTime.value >= transitionDuration.value) {
+      tempo.value = transitionEndTempo.value // Set final tempo
+      clearInterval(transitionInterval) // Clear interval
+      isTransitioning.value = false // End transition
+    } else {
+      transitionCurrentTime.value += 50 // Increase current time
+      const progress = transitionCurrentTime.value / transitionDuration.value // Calculate progress
+      tempo.value =
+        transitionStartTempo.value +
+        (transitionEndTempo.value - transitionStartTempo.value) * progress // Interpolate tempo
+    }
+  }, 50)
+}
 
 // ----------------------------------------
 // toggleMetronome
@@ -198,8 +229,9 @@ function updateHumanizedMetronomeInterval() {
 function humanizeTempo() {
   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
-  tempo.value = Math.random() * (maxTempo - minTempo) + minTempo
-  console.info(`New humanized Tempo: ${tempo.value.toFixed(2)} BPM`)
+  const newTempo = Math.random() * (maxTempo - minTempo) + minTempo
+  console.info(`New humanized Tempo: ${newTempo.toFixed(2)} BPM`)
+  updateTempoWithTransition(newTempo) // Transition to the new tempo
 }
 
 // ----------------------------------------
@@ -240,6 +272,14 @@ onUnmounted(stopHumanizedMetronome)
       <div class="flex justify-between text-sm">
         <div class="font-medium">Humanized tempo</div>
         <div>{{ tempo.toFixed(2) }} BPM</div>
+      </div>
+      <div class="flex justify-between text-xs italic">
+        <div>
+          <span class="font-medium">From</span> {{ transitionStartTempo.toFixed(2) }}
+        </div>
+        <div>
+          <span class="font-medium">To:</span> {{ transitionEndTempo.toFixed(2) }}
+        </div>
       </div>
     </div>
 
