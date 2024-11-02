@@ -20,7 +20,7 @@ const props = defineProps<TicksProps>()
         [
           props.isPlaying && props.currentBeat === beat
             ? props.highlightColor
-            : 'bg-gray-300',
+            : 'bg-secondary-300 dark:bg-secondary-500',
           props.reduceOpacity && 'opacity-20'
         ]
       ]"
