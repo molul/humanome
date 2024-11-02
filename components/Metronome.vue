@@ -422,7 +422,7 @@ const _currentOriginalBeatAux = computed(() =>
     </button>
 
     <button
-      class="bg-white py-2 px-4 rounded hover:bg-blue-600 border border-secondary-300 font-semibold"
+      class="bg-white py-2 px-4 rounded hover:text-blue-600 border border-secondary-300 font-semibold"
       @click="reset"
     >
       Reset
