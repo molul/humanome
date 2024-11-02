@@ -54,7 +54,7 @@ function playBeat() {
   humanizedTickSound.volume = humanizedVolume.value
   humanizedRestSound.volume = humanizedVolume.value
 
-  console.log(
+  console.info(
     `Beat ${currentBeat.value + 1} of ${
       beatsPerMeasure.value
     }, Tempo: ${tempo.value.toFixed(2)} BPM`
@@ -101,112 +101,54 @@ onUnmounted(stopMetronome)
 
 <template>
   <div
-    class="w-full max-w-sm m-auto flex flex-col gap-4 bg-white p-8 rounded-lg shadow-lg"
+    class="w-full lg:max-w-sm m-auto flex flex-col gap-4 bg-white p-8 rounded-lg shadow-lg border border-secondary-300"
   >
-    <h1 class="text-3xl font-bold mb-4 text-center uppercase">Humanome</h1>
+    <div class="flex items-center gap-3 justify-center">
+      <Icon name="mdi:metronome" class="size-8" />
+      <h1 class="text-3xl font-bold text-center uppercase">Humanome</h1>
+    </div>
 
-    <MetronomeSlider label="Tempo" unit="BPM" :min="40" :max="208" v-model="baseTempo" />
+    <MetronomeSlider v-model="baseTempo" label="Tempo" unit="BPM" :min="40" :max="208" />
 
     <hr />
 
     <MetronomeSlider
+      v-model="humanizeAmount"
       label="Humanize Amount"
       unit="%"
       :min="0"
       :max="10"
       :step="0.1"
-      v-model="humanizeAmount"
     />
     <MetronomeSlider
+      v-model="humanizeFrequency"
       label="Humanize Frequency"
       unit="s"
       :min="1"
       :max="10"
-      v-model="humanizeFrequency"
     />
 
     <hr />
 
-    <MetronomeSlider label="Original volume" :min="0" :max="1" v-model="originalVolume" />
     <MetronomeSlider
+      v-model="originalVolume"
+      label="Original volume"
+      :min="0"
+      :max="1"
+      :step="0.01"
+    />
+    <MetronomeSlider
+      v-model="humanizedVolume"
       label="Humanized volume"
       :min="0"
       :max="1"
-      v-model="humanizedVolume"
+      :step="0.01"
     />
-
-    <!-- <div>
-      <div class="flex justify-between">
-        <label class="block text-sm font-semibold">Tempo </label>
-        <div class="block text-sm">{{ baseTempo.toFixed(2) }} BPM</div>
-      </div>
-      <input
-        type="range"
-        min="40"
-        max="208"
-        v-model="baseTempo"
-        @input="tempo = baseTempo"
-        class="w-full"
-      />
-    </div> -->
-
     <hr />
 
-    <!-- <div>
-      <div class="flex justify-between">
-        <label class="block text-sm font-semibold">Humanize Amount </label>
-        <div class="block text-sm">{{ humanizeAmount }}</div>
-      </div>
-      <input
-        type="range"
-        min="0"
-        max="10"
-        step="0.1"
-        v-model="humanizeAmount"
-        class="w-full"
-      />
-    </div> -->
-
-    <!-- <div>
-      <label class="block text-sm font-medium"
-        >Humanize Frequency: {{ humanizeFrequency }}</label
-      >
-      <input type="range" min="1" max="10" v-model="humanizeFrequency" class="w-full" />
-    </div> -->
-
-    <!-- <hr /> -->
-
-    <!-- <div>
-      <label class="block text-sm font-medium"
-        >Original volume: {{ originalVolume }}</label
-      >
-      <input
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        v-model="originalVolume"
-        class="w-full"
-      />
-    </div> -->
-
-    <!-- <div>
-      <label class="block text-sm font-medium"
-        >Humanized volume: {{ humanizedVolume }}</label
-      >
-      <input
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        v-model="humanizedVolume"
-        class="w-full"
-      />
-    </div> -->
-
     <button
-      @click="toggleMetronome"
       class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      @click="toggleMetronome"
     >
       {{ isPlaying ? 'Stop' : 'Start' }}
     </button>
