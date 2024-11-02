@@ -25,7 +25,11 @@ const originalVolume = ref<number>(1) // Volume for original metronome
 const humanizedVolume = ref<number>(1) // Volume for humanized metronome
 
 function toggleMetronome() {
-  isPlaying.value ? stopMetronome() : startMetronome()
+  if (isPlaying.value) {
+    stopMetronome()
+  } else {
+    startMetronome()
+  }
 }
 
 function startMetronome() {
@@ -42,6 +46,29 @@ function stopMetronome() {
   elapsedHumanizeTime = 0 // Reset elapsed time
   shouldHumanizeNextBeat = false // Reset humanize flag
 }
+
+// const humanizedTickSound = ref()
+// const humanizedRestSound = ref()
+// const originalTickSound = ref()
+// const originalRestSound = ref()
+
+// Function to set initial volume for audio instances
+// function setupSounds() {
+//   humanizedTickSound.value = new Audio('/ticks/Synth_Square_A_hi.wav')
+//   humanizedRestSound.value = new Audio('/ticks/Synth_Square_A_lo.wav')
+//   originalTickSound.value = new Audio('/ticks/Perc_Clap_hi.wav')
+//   originalRestSound.value = new Audio('/ticks/Perc_Clap_lo.wav')
+
+//   originalTickSound.value.volume = originalVolume.value
+//   originalRestSound.value.volume = originalVolume.value
+//   humanizedTickSound.value.volume = humanizedVolume.value
+//   humanizedRestSound.value.volume = humanizedVolume.value
+// }
+
+// // Call setupSounds() when the component mounts
+// onMounted(() => {
+//   setupSounds()
+// })
 
 function playBeat() {
   // Create audio instances here to ensure they are fresh and avoid crashes
@@ -66,9 +93,13 @@ function playBeat() {
   if (currentBeat.value === 0) {
     humanizedTickSound.play()
     originalTickSound.play()
+    // humanizedTickSound.value.play()
+    // originalTickSound.value.play()
   } else {
     humanizedRestSound.play()
     originalRestSound.play()
+    // humanizedRestSound.value.play()
+    // originalRestSound.value.play()
   }
 
   // Advance the beat counter
@@ -100,10 +131,15 @@ function humanizeTempo() {
   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
   tempo.value = Math.random() * (maxTempo - minTempo) + minTempo
-  console.log(`Humanized Tempo: ${tempo.value.toFixed(2)} BPM`)
+  console.info(`Humanized Tempo: ${tempo.value.toFixed(2)} BPM`)
 }
 
-watch([baseTempo, beatsPerMeasure], startMetronome)
+watch([baseTempo, beatsPerMeasure], () => {
+  if (isPlaying.value) {
+    startMetronome()
+  }
+})
+
 onUnmounted(stopMetronome)
 </script>
 
@@ -122,13 +158,33 @@ onUnmounted(stopMetronome)
         label="Tempo"
         unit="BPM"
         :min="40"
-        :max="208"
+        :max="250"
       />
 
       <div class="flex justify-between text-sm">
         <div class="font-medium">Humanized tempo</div>
         <div>{{ tempo.toFixed(2) }} BPM</div>
       </div>
+    </div>
+
+    <div class="flex justify-between items-center">
+      <label for="timeSignature" class="block text-sm font-semibold"
+        >Time Signature</label
+      >
+      <select
+        id="timeSignature"
+        v-model="beatsPerMeasure"
+        class="mt-1 px-1 py-1 border border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+      >
+        <option value="1">1/1</option>
+        <option value="2">2/4</option>
+        <option value="3">3/4</option>
+        <option value="4">4/4</option>
+        <option value="5">5/4</option>
+        <option value="6">6/8</option>
+        <option value="7">7/8</option>
+        <option value="8">8/8</option>
+      </select>
     </div>
 
     <hr />
@@ -174,9 +230,5 @@ onUnmounted(stopMetronome)
     >
       {{ isPlaying ? 'Stop' : 'Start' }}
     </button>
-
-    <div v-if="isPlaying" class="text-center">
-      Humanized tempo: {{ tempo.toFixed(2) }}
-    </div>
   </div>
 </template>
