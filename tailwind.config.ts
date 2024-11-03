@@ -21,10 +21,20 @@ export default <Partial<Config>>{
         primary: colors.blue,
         secondary: colors.neutral,
         fav: 'rgba(251, 191, 36)',
-        error: '#DC2626'
+        error: '#DC2626',
+        borderLight1: colors.neutral[200],
+        borderLight2: colors.neutral[300],
+        borderDark1: colors.neutral[800],
+        borderDark2: colors.neutral[700],
+        bgLight1: colors.white,
+        bgLight2: colors.neutral[50],
+        bgDark1: colors.neutral[900],
+        bgDark2: colors.neutral[800],
+        bgDark3: colors.neutral[900]
       },
       fontFamily: {
-        primary: ['Geist', 'sans-serif']
+        primary: ['Geist', 'sans-serif'],
+        'primary-mono': ['GeistMono', 'sans-serif']
       },
       fontSize: {
         xxs: [

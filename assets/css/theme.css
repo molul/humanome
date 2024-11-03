@@ -49,4 +49,10 @@ a.textOnly,
   src: url(/fonts/geist/Geist-Bold.woff2) format('woff2');
   font-display: swap;
 }
+@font-face {
+  font-family: Geist-Mono;
+  font-weight: 400;
+  src: url(/fonts/geist-mono/GeistMono-Regular.woff2) format('woff2');
+  font-display: swap;
+}
 /* } */
