@@ -33,8 +33,8 @@ export default <Partial<Config>>{
         bgDark3: colors.neutral[900]
       },
       fontFamily: {
-        primary: ['Geist', 'sans-serif'],
-        'primary-mono': ['GeistMono', 'sans-serif']
+        primary: ['Geist', 'Geist fallback', 'sans-serif'],
+        'primary-mono': ['GeistMono', 'GeistMono fallback', 'sans-serif']
       },
       fontSize: {
         xxs: [
