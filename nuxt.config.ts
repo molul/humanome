@@ -43,16 +43,5 @@ export default defineNuxtConfig({
     importPT: {
       from: path.resolve(__dirname, './assets/primevuePresets/main/')
     }
-    // options: {
-    //   ripple: true,
-    //   theme: {
-    //     preset: Aura,
-    //     options: {
-    //       prefix: 'p',
-    //       darkModeSelector: 'system',
-    //       cssLayer: false
-    //     }
-    //   }
-    // }
   }
 })

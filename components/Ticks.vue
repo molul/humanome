@@ -3,7 +3,7 @@ interface TicksProps {
   beatsPerMeasure: number
   isPlaying: boolean
   currentBeat: number
-  highlightColor: string
+  highlightColors: string[]
   reduceOpacity: boolean
 }
 
@@ -16,14 +16,18 @@ const props = defineProps<TicksProps>()
       v-for="beat in props.beatsPerMeasure"
       :key="`${beat}`"
       :class="[
-        'w-full h-8 rounded shadow-md border-2 border-black/20 transition-all',
+        'w-full h-8 rounded-md shadow-md border-2 border-black/20 transition-all flex items-center justify-center font-bold text-white text-lg',
         [
           props.isPlaying && props.currentBeat === beat
-            ? props.highlightColor
-            : 'bg-secondary-300 dark:bg-secondary-500',
+            ? beat === 1
+              ? props.highlightColors[0]
+              : props.highlightColors[1]
+            : 'bg-secondary-400/70 dark:bg-secondary-500',
           props.reduceOpacity && 'opacity-20'
         ]
       ]"
-    ></div>
+    >
+      {{ beat }}
+    </div>
   </div>
 </template>

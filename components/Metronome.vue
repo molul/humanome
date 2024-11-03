@@ -453,13 +453,13 @@ function updateTempoWithTransition(newTempo: number) {
     <div class="flex justify-between">
       <div class="flex items-center gap-3 justify-center">
         <Icon name="mdi:metronome" class="size-6 lg:size-8" />
-        <h1 class="text-xl lg:text-3xl font-bold text-center uppercase">Humanome</h1>
+        <h1 class="text-2xl lg:text-3xl font-bold text-center uppercase">Humanome</h1>
       </div>
       <SelectThemeButton />
     </div>
 
-    <div class="flex flex-col gap-3">
-      <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-3">
         <MetronomeSlider
           v-model="baseTempo"
           label="Tempo"
@@ -477,7 +477,7 @@ function updateTempoWithTransition(newTempo: number) {
       <Divider />
 
       <div class="flex justify-between items-center">
-        <label for="timeSignature" class="block text-xs lg:text-sm font-semibold"
+        <label for="timeSignature" class="block text-sm font-semibold"
           >Time Signature</label
         >
         <Select
@@ -503,7 +503,7 @@ function updateTempoWithTransition(newTempo: number) {
         v-model="humanizeFrequency"
         label="Humanize Frequency"
         unit="s"
-        class="mb-2"
+        class="mb-1"
         :min="1"
         :max="10"
       />
@@ -522,7 +522,7 @@ function updateTempoWithTransition(newTempo: number) {
         :beats-per-measure="beatsPerMeasure"
         :is-playing="isPlaying"
         :current-beat="_currentHumanizedBeatAux"
-        highlight-color="bg-blue-600"
+        :highlight-colors="['bg-primary-600', 'bg-violet-600']"
         :reduce-opacity="humanizedVolume === 0"
       />
 
@@ -540,7 +540,7 @@ function updateTempoWithTransition(newTempo: number) {
         :beats-per-measure="beatsPerMeasure"
         :is-playing="isPlaying"
         :current-beat="_currentOriginalBeatAux"
-        highlight-color="bg-green-600"
+        :highlight-colors="['bg-green-600', 'bg-amber-600']"
         :reduce-opacity="originalVolume === 0"
       />
     </div>

@@ -129,7 +129,7 @@ export default {
       {
         'text-white dark:text-surface-900':
           props.severity === 'info' && !props.text && !props.outlined && !props.plain,
-        'bg-blue-500 dark:bg-blue-400':
+        'bg-primary-500 dark:bg-primary-400':
           props.severity === 'info' && !props.text && !props.outlined && !props.plain,
         'border border-blue-500 dark:border-blue-400':
           props.severity === 'info' && !props.text && !props.outlined && !props.plain
@@ -141,7 +141,7 @@ export default {
       },
       // Info Outlined Button
       {
-        'text-blue-500 border border-blue-500 hover:bg-blue-300/20 ':
+        'text-blue-500 border border-blue-500 hover:bg-primary-300/20 ':
           props.outlined && props.severity === 'info' && !props.plain
       },
 
@@ -286,13 +286,13 @@ export default {
 
       // Info
       {
-        'hover:bg-blue-600 dark:hover:bg-blue-300 hover:border-blue-600 dark:hover:border-blue-300':
+        'hover:bg-primary-600 dark:hover:bg-primary-300 hover:border-blue-600 dark:hover:border-blue-300':
           props.severity === 'info' && !props.text && !props.outlined && !props.plain
       },
       { 'focus:ring-blue-400/50 dark:focus:ring-blue-300/50': props.severity === 'info' },
       // Text & Outlined Button
       {
-        'hover:bg-blue-300/20':
+        'hover:bg-primary-300/20':
           (props.text || props.outlined) && props.severity === 'info' && !props.plain
       },
 

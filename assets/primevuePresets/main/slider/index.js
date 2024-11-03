@@ -35,7 +35,7 @@ export default {
       },
 
       // Colors
-      'bg-blue-500 dark:bg-blue-500'
+      'bg-primary-500 dark:bg-primary-500'
     ]
   }),
   handle: ({ props }) => ({
