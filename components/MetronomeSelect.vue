@@ -1,6 +1,12 @@
 <script lang="ts" setup>
+interface SelectOptionProps {
+  label: string
+  value: string | number
+}
+
 interface MetronomeSliderProps {
   label: string
+  options: SelectOptionProps[]
   modelValue: number
 }
 const props = defineProps<MetronomeSliderProps>()
@@ -9,10 +15,10 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: number): void
 }>()
 
-function onInput(event: Event) {
-  const value = (event.target as HTMLInputElement).valueAsNumber
-  emit('update:modelValue', value)
-}
+const _selectValue = computed({
+  get: () => props.modelValue,
+  set: (value: number) => emit('update:modelValue', value)
+})
 </script>
 
 <template>
@@ -20,20 +26,12 @@ function onInput(event: Event) {
     <label for="timeSignature" class="block text-sm font-semibold">{{
       props.label
     }}</label>
-    <select
-      id="timeSignature"
-      :value="props.modelValue"
-      class="mt-1 px-1 py-1 border border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-      @change="onInput"
-    >
-      <option value="1">1/1</option>
-      <option value="2">2/4</option>
-      <option value="3">3/4</option>
-      <option value="4">4/4</option>
-      <option value="5">5/4</option>
-      <option value="6">6/8</option>
-      <option value="7">7/8</option>
-      <option value="8">8/8</option>
-    </select>
+    <Select
+      v-model="_selectValue"
+      :options="props.options"
+      option-label="label"
+      option-value="value"
+      placeholder="Select..."
+    />
   </div>
 </template>

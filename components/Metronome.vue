@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import MetronomeSlider from './MetronomeSlider.vue'
-import SelectThemeButton from './SelectThemeButton.vue'
 import HumanizedTempoInfo from './HumanizedTempoInfo.vue'
 import Ticks from './Ticks.vue'
 import Buttons from './Buttons.vue'
+import MetronomeSelect from './MetronomeSelect.vue'
 
 // Existing state variables
 const baseTempo = ref<number>(120) // Base tempo without humanization
@@ -47,7 +47,6 @@ const _currentOriginalBeatAux = computed(() =>
 )
 
 // Web Audio API variables
-// let audioContext: AudioContext | null = null
 let originalAudioContext: AudioContext | null = null
 let humanizedAudioContext: AudioContext | null = null
 
@@ -55,8 +54,6 @@ const lookAhead = 0.1 // How far ahead to schedule audio (in seconds)
 let nextTickTimeOriginal = 0.0
 let nextTickTimeHumanized = 0.0
 let schedulerTimerID: number | null = null
-
-// const highTempoCounter = ref(0)
 
 const timeSignatureOptions = [
   { label: '1/1', value: 1 },
@@ -145,7 +142,6 @@ function toggleMetronome() {
 // ----------------------------------------
 function reset() {
   if (isPlaying.value) {
-    // clearInterval(transitionInterval.value) // Clear interval
     stopOriginalMetronome()
     stopHumanizedMetronome()
     stopScheduler()
@@ -269,9 +265,7 @@ function scheduleHumanizedBeat(time: number) {
   }
 
   if (shouldHumanizeNextBeat) {
-    // humanizeTempo()
-    // humanizeTempo2()
-    humanizeTempo3()
+    humanizeTempo()
     shouldHumanizeNextBeat = false
   }
 }
@@ -315,65 +309,7 @@ function stopHumanizedMetronome() {
 // ----------------------------------------
 // humanizeTempo
 // ----------------------------------------
-// function humanizeTempo() {
-//   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
-//   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
-//   const newTempo = Math.random() * (maxTempo - minTempo) + minTempo
-//   updateTempoWithTransition(newTempo) // Transition to the new tempo
-// }
-
-// ----------------------------------------
-// humanizeTempo2
-// ----------------------------------------
-// function humanizeTempo2() {
-//   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
-//   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
-
-//   // Calculate 1.5% of the current tempo
-//   const adjustmentAmount = tempo.value * 0.015
-//   const minAdjustedTempo = tempo.value - adjustmentAmount
-//   const maxAdjustedTempo = tempo.value + adjustmentAmount
-
-//   let newTempo
-
-//   // If tempo has been high, prefer lower values
-//   if (highTempoCounter.value > 0) {
-//     // Create a random value biased towards lower values
-//     const lowerBias = Math.random() * 0.7 // Adjust this to change bias strength
-//     const biasedMin = minAdjustedTempo - lowerBias * adjustmentAmount
-//     const biasedMax = minAdjustedTempo + adjustmentAmount * (1 - lowerBias)
-
-//     // Clamp the new tempo between minTempo and maxTempo
-//     newTempo = Math.max(
-//       minTempo,
-//       Math.min(maxTempo, Math.random() * (biasedMax - biasedMin) + biasedMin)
-//     )
-
-//     // Decrease the counter to gradually reduce the bias
-//     highTempoCounter.value = Math.max(0, highTempoCounter.value - 1) // Reset or decrease
-//   } else {
-//     // Generate a standard random tempo when not biased
-//     newTempo = Math.max(
-//       minTempo,
-//       Math.min(
-//         maxTempo,
-//         Math.random() * (maxAdjustedTempo - minAdjustedTempo) + minAdjustedTempo
-//       )
-//     )
-//   }
-
-//   // Check if current tempo is higher than baseTempo to adjust the counter
-//   if (tempo.value > baseTempo.value) {
-//     highTempoCounter.value++
-//   }
-
-//   updateTempoWithTransition(newTempo) // Transition to the new tempo
-// }
-
-// ----------------------------------------
-// humanizeTempo3
-// ----------------------------------------
-function humanizeTempo3() {
+function humanizeTempo() {
   const minTempo = baseTempo.value - baseTempo.value * (humanizeAmount.value / 100)
   const maxTempo = baseTempo.value + baseTempo.value * (humanizeAmount.value / 100)
 
@@ -398,7 +334,6 @@ function humanizeTempo3() {
   updateTempoWithTransition(newTempo) // Transition to the new tempo
 }
 
-// const transitionInterval = ref()
 // ----------------------------------------
 // Function to update tempo with transition
 // ----------------------------------------
@@ -413,21 +348,6 @@ function updateTempoWithTransition(newTempo: number) {
   const totalSteps = Math.ceil((humanizeFrequency.value * 1000) / step)
   let currentStep = 0
 
-  // transitionInterval.value = setInterval(() => {
-  //   currentStep++
-  //   transitionCurrentTime.value += step
-
-  //   if (currentStep >= totalSteps) {
-  //     tempo.value = transitionEndTempo.value // Set final tempo
-  //     clearInterval(transitionInterval.value) // Clear interval
-  //     isTransitioning.value = false // End transition
-  //   } else {
-  //     const progress = currentStep / totalSteps
-  //     tempo.value =
-  //       transitionStartTempo.value +
-  //       (transitionEndTempo.value - transitionStartTempo.value) * progress // Interpolate tempo
-  //   }
-  // }, step)
   const transitionInterval = setInterval(() => {
     currentStep++
     transitionCurrentTime.value += step
@@ -447,17 +367,7 @@ function updateTempoWithTransition(newTempo: number) {
 </script>
 
 <template>
-  <div
-    class="w-full flex flex-col gap-6 lg:gap-7 bg-white dark:bg-secondary-800 rounded-lg"
-  >
-    <div class="flex justify-between">
-      <div class="flex items-center gap-3 justify-center">
-        <Icon name="mdi:metronome" class="size-6 lg:size-8" />
-        <h1 class="text-2xl lg:text-3xl font-bold text-center uppercase">Humanome</h1>
-      </div>
-      <SelectThemeButton />
-    </div>
-
+  <div class="w-full flex flex-col gap-6 lg:gap-7 rounded-lg">
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-3">
         <MetronomeSlider
@@ -476,18 +386,11 @@ function updateTempoWithTransition(newTempo: number) {
 
       <Divider />
 
-      <div class="flex justify-between items-center">
-        <label for="timeSignature" class="block text-sm font-semibold"
-          >Time Signature</label
-        >
-        <Select
-          v-model="beatsPerMeasure"
-          :options="timeSignatureOptions"
-          option-label="label"
-          option-value="value"
-          placeholder="Select..."
-        />
-      </div>
+      <MetronomeSelect
+        v-model="beatsPerMeasure"
+        label="Time signature"
+        :options="timeSignatureOptions"
+      />
 
       <Divider />
 

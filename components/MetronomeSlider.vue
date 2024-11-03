@@ -17,7 +17,7 @@ const emit = defineEmits<{
 }>()
 
 // Computed property for two-way binding with PrimeVue Slider
-const sliderValue = computed({
+const _sliderValue = computed({
   get: () => props.modelValue,
   set: (value: number) => emit('update:modelValue', value)
 })
@@ -27,14 +27,14 @@ const sliderValue = computed({
   <div class="flex flex-col gap-3">
     <div class="flex justify-between">
       <label class="block font-semibold">{{ props.label }} </label>
-      <div class="block">{{ props.modelValue }} {{ props.unit }}</div>
+      <div class="block font-primary-mono">{{ props.modelValue }} {{ props.unit }}</div>
     </div>
 
     <div class="flex gap-4 items-center">
       <Icon v-if="props.icon" :name="props.icon" class="size-6" />
 
       <Slider
-        v-model="sliderValue"
+        v-model="_sliderValue"
         :min="props.min"
         :max="props.max"
         :step="props.step"

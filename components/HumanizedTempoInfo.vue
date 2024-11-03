@@ -11,7 +11,7 @@ const props = defineProps<HumanizedTemporInfoProps>()
 <template>
   <div class="flex justify-between text-sm">
     <div class="font-medium">Humanized tempo</div>
-    <div>{{ props.tempo.toFixed(2) }} BPM</div>
+    <div class="font-primary-mono">{{ props.tempo.toFixed(2) }} BPM</div>
   </div>
 
   <!-- <div class="flex justify-between text-xxs lg:text-xs">
