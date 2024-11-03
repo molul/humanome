@@ -9,6 +9,7 @@ interface MetronomeSliderProps {
   icon?: string
   step?: number
   modelValue: number
+  toFixed?: boolean
 }
 
 const props = defineProps<MetronomeSliderProps>()
@@ -27,7 +28,10 @@ const _sliderValue = computed({
   <div class="flex flex-col gap-3">
     <div class="flex justify-between">
       <label class="block font-semibold">{{ props.label }} </label>
-      <div class="block font-primary-mono">{{ props.modelValue }} {{ props.unit }}</div>
+      <div class="block font-primary-mono">
+        {{ props.toFixed ? props.modelValue.toFixed(2) : props.modelValue }}
+        {{ props.unit }}
+      </div>
     </div>
 
     <div class="flex gap-4 items-center">

@@ -400,7 +400,7 @@ function updateTempoWithTransition(newTempo: number) {
         unit="%"
         :min="0"
         :max="10"
-        :step="0.1"
+        :step="1"
       />
       <MetronomeSlider
         v-model="humanizeFrequency"
@@ -419,6 +419,7 @@ function updateTempoWithTransition(newTempo: number) {
         :min="0"
         :max="1"
         :step="0.01"
+        :to-fixed="true"
         icon="mdi:volume-high"
       />
       <Ticks
@@ -437,6 +438,7 @@ function updateTempoWithTransition(newTempo: number) {
         :min="0"
         :max="1"
         :step="0.01"
+        :to-fixed="true"
         icon="mdi:volume-high"
       />
       <Ticks
