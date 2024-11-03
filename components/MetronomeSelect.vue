@@ -31,6 +31,7 @@ const _selectValue = computed({
       :options="props.options"
       option-label="label"
       option-value="value"
+      :scroll-height="`30rem`"
       placeholder="Select..."
     />
   </div>
