@@ -43,5 +43,9 @@ export default defineNuxtConfig({
     importPT: {
       from: path.resolve(__dirname, './assets/primevuePresets/main/')
     }
+  },
+
+  tailwindcss: {
+    viewer: false
   }
 })
